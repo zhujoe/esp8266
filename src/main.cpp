@@ -1,9 +1,18 @@
 #include <Arduino.h>
+#include "Network.h"
 
-void setup() {
-  // put your setup code here, to run once:
+Network network;
+
+void setup()
+{
+  Serial.begin(115200);
+  Serial.println("@boardcard is working");
+
+  network.init();
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+void loop()
+{
+  Serial.println(network.getTime());
+  delay(1000);
 }
