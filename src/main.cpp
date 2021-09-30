@@ -1099,6 +1099,12 @@ void setup()
 
 void loop()
 {
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    wifiErrPage();
+    delay(500);
+  }
+
   if (!client.connected())
   {
     noMessagesPage();
