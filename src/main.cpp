@@ -31,8 +31,8 @@ struct Menu
   int index;
   int left;
   int right;
-  int enter;   // enter key
-  int back; // back key
+  int enter;
+  int back;
   void (*callback)();
 };
 uint8_t enterKey = 5;
@@ -44,7 +44,7 @@ char const *itopic = "cube/dashboard";
 uint8_t intervalmessagetime = 5;
 int timenowEpoch = 0;
 int recmessagetime = 0;
-uint8_t nomessagesflag = 0;
+uint8_t nomessagesflag = 1;
 WiFiClient espClient;
 PubSubClient client(espClient);
 struct DashboardData
@@ -325,9 +325,8 @@ void ICACHE_FLASH_ATTR mqtt_reconnect()
 
 void ICACHE_FLASH_ATTR headPage()
 {
-
-  u8g2.setFont(u8g2_font_open_iconic_all_1x_t);
-  u8g2.drawGlyph(0, 8, 123);
+  // u8g2.setFont(u8g2_font_open_iconic_all_1x_t);
+  // u8g2.drawGlyph(0, 8, 123);
   u8g2.setFont(u8g2_font_artossans8_8n);
   u8g2.setCursor(9, 8);
   u8g2.print(timeClient.getFormattedTime());
@@ -352,12 +351,16 @@ void ICACHE_FLASH_ATTR headPage()
   u8g2.setFont(u8g2_font_open_iconic_all_1x_t);
   u8g2.drawGlyph(100, 8, 248); // wifi
 
-  u8g2.setFont(u8g2_font_open_iconic_all_1x_t);
-  u8g2.drawGlyph(90, 8, 143); // updata
-
-  u8g2.setFont(u8g2_font_open_iconic_all_1x_t);
-  u8g2.drawGlyph(80, 8, 142); // download
-
+  if (currentData.net_speed_sent >= 0.01)
+  {
+    u8g2.setFont(u8g2_font_open_iconic_all_1x_t);
+    u8g2.drawGlyph(90, 8, 143); // updata
+  }
+  if (currentData.net_speed_recv >= 0.01)
+  {
+    u8g2.setFont(u8g2_font_open_iconic_all_1x_t);
+    u8g2.drawGlyph(80, 8, 142); // download
+  }
   u8g2.drawHLine(0, 9, 128);
 }
 
@@ -521,22 +524,22 @@ void ICACHE_FLASH_ATTR memoryPage()
 
   u8g2.setFont(u8g2_font_6x10_tf);
   u8g2.setCursor(netx, nety);
-  u8g2.print("v-total / v-free :");
+  u8g2.print("v-total");
+  u8g2.print(currentData.virtual_memory_total);
   nety += 11;
 
   u8g2.setCursor(netx, nety);
-  u8g2.print(currentData.virtual_memory_total);
-  u8g2.print(" / ");
+  u8g2.print("v-free");
   u8g2.print(currentData.virtual_memory_free);
   nety += 11;
 
   u8g2.setCursor(netx, nety);
-  u8g2.print("s-total / s-free :");
+  u8g2.print("s-total");
+  u8g2.print(currentData.swap_memory_total);
   nety += 11;
 
   u8g2.setCursor(netx, nety);
-  u8g2.print(currentData.swap_memory_total);
-  u8g2.print(" / ");
+  u8g2.print("s-free");
   u8g2.print(currentData.swap_memory_free);
 
   u8g2.setCursor(2, 60);
@@ -610,14 +613,8 @@ void ICACHE_FLASH_ATTR noMessagesPage()
 
 void ICACHE_FLASH_ATTR rebootPage()
 {
-  // uint8_t netx = 2;
-  // uint8_t nety = 17;
-
   u8g2.clearBuffer();
   headPage();
-  // u8g2.setFont(u8g2_font_6x10_tf);
-  // u8g2.setCursor(netx, nety);
-  // u8g2.print("instruction");
 
   u8g2.setFont(u8g2_font_8x13_tf);
   u8g2.setCursor(2, 60);
@@ -648,19 +645,13 @@ void ICACHE_FLASH_ATTR doreboot()
   u8g2.drawGlyph(90, 62, 120);
   u8g2.sendBuffer();
   delay(2000);
-  ESP.restart();
+  // ESP.restart();
 }
 
 void ICACHE_FLASH_ATTR shutdownPage()
 {
-  // uint8_t netx = 2;
-  // uint8_t nety = 17;
-
   u8g2.clearBuffer();
   headPage();
-  // u8g2.setFont(u8g2_font_6x10_tf);
-  // u8g2.setCursor(netx, nety);
-  // u8g2.print("instruction");
 
   u8g2.setFont(u8g2_font_8x13_tf);
   u8g2.setCursor(2, 60);
@@ -691,7 +682,7 @@ void ICACHE_FLASH_ATTR doshutdown()
   u8g2.drawGlyph(90, 62, 120);
   u8g2.sendBuffer();
   delay(2000);
-  ESP.restart();
+  // ESP.restart();
 }
 
 void ICACHE_FLASH_ATTR smartcfgPage_off()
@@ -740,7 +731,7 @@ void ICACHE_FLASH_ATTR wifiErrPage()
   // uint8_t nety = 17;
 
   u8g2.clearBuffer();
-  headPage();
+
   // u8g2.setFont(u8g2_font_6x10_tf);
   // u8g2.setCursor(netx, nety);
   // u8g2.print("instruction");
@@ -884,15 +875,8 @@ void ICACHE_FLASH_ATTR controlPage()
 
 void ICACHE_FLASH_ATTR volumePage()
 {
-  // uint8_t netx = 2;
-  // uint8_t nety = 17;
-
   u8g2.clearBuffer();
   headPage();
-  // u8g2.setFont(u8g2_font_6x10_tf);
-  // u8g2.setCursor(netx, nety);
-  // u8g2.print("instruction");
-
   u8g2.setFont(u8g2_font_8x13_tf);
   u8g2.setCursor(2, 60);
   u8g2.print("Volume");
@@ -904,14 +888,8 @@ void ICACHE_FLASH_ATTR volumePage()
 
 void ICACHE_FLASH_ATTR settingPage()
 {
-  // uint8_t netx = 2;
-  // uint8_t nety = 17;
-
   u8g2.clearBuffer();
   headPage();
-  // u8g2.setFont(u8g2_font_6x10_tf);
-  // u8g2.setCursor(netx, nety);
-  // u8g2.print("instruction");
 
   u8g2.setFont(u8g2_font_8x13_tf);
   u8g2.setCursor(2, 60);
@@ -942,13 +920,10 @@ void ICACHE_FLASH_ATTR doSettingPage()
   u8g2.clearBuffer();
   headPage();
   u8g2.setFont(u8g2_font_6x10_tf);
-  // u8g2.setCursor(netx, nety);
-  // u8g2.print("instruction");
-  // nety += 11;
-
   u8g2.setCursor(netx, nety);
   u8g2.print("local ");
   u8g2.print(WiFi.localIP());
+  // nety += 11;
 
   u8g2.setFont(u8g2_font_8x13_tf);
   u8g2.setCursor(2, 60);
@@ -985,22 +960,22 @@ Menu menu[21] = {
     {2, 1, 3, 2, 0, datePage},
     {3, 2, 1, 3, 0, lifePage},
     //---------server----------
-    {4, 0, 11, 5, 4, serverPage},
-    {5, 10, 6, 5, 4, totalityPage},
+    {4, 0, 17, 5, 4, serverPage},
+    {5, 11, 6, 5, 4, totalityPage},
     {6, 5, 7, 6, 4, cpuPage},
     {7, 6, 8, 7, 4, diskPage},
     {8, 7, 9, 8, 4, memoryPage},
     {9, 8, 10, 9, 4, networkPage},
-    {10, 9, 5, 10, 4, uptimePage},
-    //----------control---------
-    {11, 4, 17, 12, 11, controlPage},
+    {10, 9, 11, 10, 4, uptimePage},
+    //-------server_control-------
+    {11, 10, 5, 12, 4, controlPage},
     {12, 16, 14, 13, 11, rebootPage},
     {13, 13, 13, 13, 13, doreboot},
     {14, 12, 16, 15, 11, shutdownPage},
     {15, 15, 15, 15, 15, doshutdown},
     {16, 14, 12, 16, 11, volumePage},
     //---------note----------
-    {17, 11, 18, 17, 17, notePage},
+    {17, 4, 18, 17, 17, notePage},
     //--------setting----------
     {18, 17, 0, 19, 18, settingPage},
     {19, 19, 19, 19, 18, doSettingPage},
