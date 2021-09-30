@@ -328,7 +328,7 @@ void ICACHE_FLASH_ATTR headPage()
   // u8g2.setFont(u8g2_font_open_iconic_all_1x_t);
   // u8g2.drawGlyph(0, 8, 123);
   u8g2.setFont(u8g2_font_artossans8_8n);
-  u8g2.setCursor(9, 8);
+  u8g2.setCursor(8, 8);
   u8g2.print(timeClient.getFormattedTime());
 
   if (currentData.alert)
@@ -384,36 +384,42 @@ void ICACHE_FLASH_ATTR totalityPage()
   u8g2.clearBuffer();
   headPage();
 
-  u8g2.setFont(u8g2_font_5x8_tf);
+  u8g2.setFont(u8g2_font_5x8_tr);
   u8g2.setCursor(netx, nety);
-  u8g2.print("cpu_temperature  ");
+  u8g2.print("cpu_temperature   ");
   u8g2.print(currentData.cpu_temperature);
+  u8g2.print("'C");
   nety += 9;
 
   u8g2.setCursor(netx, nety);
-  u8g2.print("cpu_percent  ");
+  u8g2.print("cpu_percent      ");
   u8g2.print(currentData.cpu_percent);
+  u8g2.print("%");
   nety += 9;
 
   u8g2.setCursor(netx, nety);
-  u8g2.print("net_recv  ");
+  u8g2.print("net_recv         ");
   u8g2.print(currentData.net_speed_recv);
+  u8g2.print("mb");
   nety += 9;
 
   u8g2.setCursor(netx, nety);
-  u8g2.print("memory_free  ");
+  u8g2.print("memory_free   ");
   // u8g2.print( (currentData.virtual_memory_free*100+0.05)/100 );
   u8g2.print(currentData.virtual_memory_free);
+  u8g2.print("mb");
   nety += 9;
 
   u8g2.setCursor(netx, nety);
-  u8g2.print("disk_free  ");
+  u8g2.print("disk_free   ");
   u8g2.print(currentData.disk_usage_free);
+  u8g2.print("mb");
   nety += 9;
 
   u8g2.setCursor(netx, nety);
-  u8g2.print("disk_percent  ");
+  u8g2.print("disk_percent    ");
   u8g2.print(currentData.disk_usage_percent);
+  u8g2.print("%");
   // nety += 9;
 
   // u8g2.setCursor(netx, nety);
@@ -450,7 +456,7 @@ void ICACHE_FLASH_ATTR uptimePage()
   u8g2.print("Up_time");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 123);
+  u8g2.drawGlyph(95, 62, 123);
   u8g2.sendBuffer();
 }
 
@@ -466,23 +472,26 @@ void ICACHE_FLASH_ATTR cpuPage()
   u8g2.setCursor(netx, nety);
   u8g2.print("temperature  ");
   u8g2.print(currentData.cpu_temperature);
+  u8g2.print("'C");
   nety += 11;
 
   u8g2.setCursor(netx, nety);
-  u8g2.print("percent  ");
+  u8g2.print("percent ");
   u8g2.print(currentData.cpu_percent);
+  u8g2.print("%");
   nety += 11;
 
   u8g2.setCursor(netx, nety);
-  u8g2.print("current  ");
+  u8g2.print("current ");
   u8g2.print(currentData.cpu_current);
+  u8g2.print("Mhz");
 
   u8g2.setCursor(2, 60);
   u8g2.setFont(u8g2_font_8x13_tf);
   u8g2.print("Cpu");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 177);
+  u8g2.drawGlyph(95, 62, 177);
   u8g2.sendBuffer();
 }
 
@@ -498,11 +507,13 @@ void ICACHE_FLASH_ATTR diskPage()
   u8g2.setCursor(netx, nety);
   u8g2.print("free  ");
   u8g2.print(currentData.disk_usage_free);
+  u8g2.print("mb");
   nety += 11;
 
   u8g2.setCursor(netx, nety);
   u8g2.print("percent  ");
   u8g2.print(currentData.disk_usage_percent);
+  u8g2.print("%");
   nety += 11;
 
   u8g2.setCursor(2, 60);
@@ -510,7 +521,7 @@ void ICACHE_FLASH_ATTR diskPage()
   u8g2.print("Disk");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 171);
+  u8g2.drawGlyph(95, 62, 171);
   u8g2.sendBuffer();
 }
 
@@ -524,30 +535,34 @@ void ICACHE_FLASH_ATTR memoryPage()
 
   u8g2.setFont(u8g2_font_6x10_tf);
   u8g2.setCursor(netx, nety);
-  u8g2.print("v-total");
+  u8g2.print("v-total ");
   u8g2.print(currentData.virtual_memory_total);
+  u8g2.print("mb");
   nety += 11;
 
   u8g2.setCursor(netx, nety);
-  u8g2.print("v-free");
+  u8g2.print("v-free  ");
   u8g2.print(currentData.virtual_memory_free);
+  u8g2.print("mb");
   nety += 11;
 
-  u8g2.setCursor(netx, nety);
-  u8g2.print("s-total");
-  u8g2.print(currentData.swap_memory_total);
-  nety += 11;
+  // u8g2.setCursor(netx, nety);
+  // u8g2.print("s-total ");
+  // u8g2.print(currentData.swap_memory_total);
+  // u8g2.print(" mb");
+  // nety += 11;
 
-  u8g2.setCursor(netx, nety);
-  u8g2.print("s-free");
-  u8g2.print(currentData.swap_memory_free);
+  // u8g2.setCursor(netx, nety);
+  // u8g2.print("s-free  ");
+  // u8g2.print(currentData.swap_memory_free);
+  // u8g2.print(" mb");
 
   u8g2.setCursor(2, 60);
   u8g2.setFont(u8g2_font_8x13_tf);
   u8g2.print("Memory");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 139);
+  u8g2.drawGlyph(95, 62, 139);
   u8g2.sendBuffer();
 }
 
@@ -573,28 +588,29 @@ void ICACHE_FLASH_ATTR networkPage()
   u8g2.setCursor(netx, nety);
   u8g2.print("recv  ");
   u8g2.print(currentData.net_speed_recv);
+  u8g2.print("mb");
   nety += 11;
 
   u8g2.setCursor(netx, nety);
   u8g2.print("sent  ");
   u8g2.print(currentData.net_speed_sent);
+  u8g2.print("mb");
 
   u8g2.setCursor(2, 60);
   u8g2.setFont(u8g2_font_8x13_tf);
   u8g2.print("Network");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 194);
+  u8g2.drawGlyph(95, 62, 194);
   u8g2.sendBuffer();
 }
 
 void ICACHE_FLASH_ATTR noMessagesPage()
 {
   uint8_t netx = 2;
-  uint8_t nety = 18;
+  uint8_t nety = 11;
 
   u8g2.clearBuffer();
-  headPage();
   u8g2.setFont(u8g2_font_6x10_tf);
   u8g2.setCursor(netx, nety);
   u8g2.print("no messages received!");
@@ -607,7 +623,7 @@ void ICACHE_FLASH_ATTR noMessagesPage()
   u8g2.print("Mqtt_Err");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 121);
+  u8g2.drawGlyph(95, 62, 121);
   u8g2.sendBuffer();
 }
 
@@ -621,7 +637,7 @@ void ICACHE_FLASH_ATTR rebootPage()
   u8g2.print("Reboot");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 243);
+  u8g2.drawGlyph(95, 62, 243);
   u8g2.sendBuffer();
 }
 
@@ -642,10 +658,10 @@ void ICACHE_FLASH_ATTR doreboot()
   u8g2.print("reboot");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 120);
+  u8g2.drawGlyph(95, 62, 120);
   u8g2.sendBuffer();
   delay(2000);
-  // ESP.restart();
+  ESP.restart();
 }
 
 void ICACHE_FLASH_ATTR shutdownPage()
@@ -658,7 +674,7 @@ void ICACHE_FLASH_ATTR shutdownPage()
   u8g2.print("Shutdown");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 235);
+  u8g2.drawGlyph(95, 62, 235);
   u8g2.sendBuffer();
 }
 
@@ -679,10 +695,10 @@ void ICACHE_FLASH_ATTR doshutdown()
   u8g2.print("Shutdown");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 120);
+  u8g2.drawGlyph(95, 62, 120);
   u8g2.sendBuffer();
   delay(2000);
-  // ESP.restart();
+  ESP.restart();
 }
 
 void ICACHE_FLASH_ATTR smartcfgPage_off()
@@ -701,7 +717,7 @@ void ICACHE_FLASH_ATTR smartcfgPage_off()
   u8g2.print("Smartcfg");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 197);
+  u8g2.drawGlyph(95, 62, 197);
   u8g2.sendBuffer();
 }
 
@@ -721,27 +737,30 @@ void ICACHE_FLASH_ATTR smartcfgPage_on()
   u8g2.print("Smartcfg");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 198);
+  u8g2.drawGlyph(95, 62, 198);
   u8g2.sendBuffer();
 }
 
 void ICACHE_FLASH_ATTR wifiErrPage()
 {
-  // uint8_t netx = 2;
-  // uint8_t nety = 17;
+  uint8_t netx = 2;
+  uint8_t nety = 11;
 
   u8g2.clearBuffer();
 
-  // u8g2.setFont(u8g2_font_6x10_tf);
-  // u8g2.setCursor(netx, nety);
-  // u8g2.print("instruction");
+  u8g2.setFont(u8g2_font_6x10_tf);
+  u8g2.setCursor(netx, nety);
+  u8g2.print("no Internet!");
+  nety += 11;
+  u8g2.setCursor(netx, nety);
+  u8g2.print("check your wifi");
 
   u8g2.setFont(u8g2_font_8x13_tf);
   u8g2.setCursor(2, 60);
   u8g2.print("wifi_err");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 121);
+  u8g2.drawGlyph(95, 62, 121);
   u8g2.sendBuffer();
 }
 
@@ -765,7 +784,7 @@ void ICACHE_FLASH_ATTR serverPage()
   u8g2.print("Server");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 222);
+  u8g2.drawGlyph(95, 62, 222);
   u8g2.sendBuffer();
 }
 
@@ -785,7 +804,7 @@ void ICACHE_FLASH_ATTR datePage()
   u8g2.print("Date");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 249);
+  u8g2.drawGlyph(95, 62, 249);
   u8g2.sendBuffer();
 }
 
@@ -805,7 +824,7 @@ void ICACHE_FLASH_ATTR notePage()
   u8g2.print("NotePad");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 257);
+  u8g2.drawGlyph(95, 62, 257);
   u8g2.sendBuffer();
 }
 
@@ -825,7 +844,7 @@ void ICACHE_FLASH_ATTR lifePage()
   u8g2.print("Life");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 98);
+  u8g2.drawGlyph(95, 62, 98);
   u8g2.sendBuffer();
 }
 
@@ -845,7 +864,7 @@ void ICACHE_FLASH_ATTR countDownPage()
   u8g2.print("Countdown");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 269);
+  u8g2.drawGlyph(95, 62, 269);
   u8g2.sendBuffer();
 }
 
@@ -869,7 +888,7 @@ void ICACHE_FLASH_ATTR controlPage()
   u8g2.print("Control");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 265);
+  u8g2.drawGlyph(95, 62, 265);
   u8g2.sendBuffer();
 }
 
@@ -882,7 +901,7 @@ void ICACHE_FLASH_ATTR volumePage()
   u8g2.print("Volume");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 105);
+  u8g2.drawGlyph(95, 62, 105);
   u8g2.sendBuffer();
 }
 
@@ -896,7 +915,7 @@ void ICACHE_FLASH_ATTR settingPage()
   u8g2.print("Setting");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 129);
+  u8g2.drawGlyph(95, 62, 129);
   u8g2.sendBuffer();
 
   if (serverflg)
@@ -930,7 +949,7 @@ void ICACHE_FLASH_ATTR doSettingPage()
   u8g2.print("Setting");
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
-  u8g2.drawGlyph(90, 62, 120);
+  u8g2.drawGlyph(95, 62, 120);
   u8g2.sendBuffer();
 
   if (serverflg == 0)
@@ -985,7 +1004,7 @@ Menu menu[21] = {
 };
 void (*operation_index)();
 int func_index = 0;
-int stack_func_index = 0;
+// int stack_func_index = 0;
 
 void setup()
 {
