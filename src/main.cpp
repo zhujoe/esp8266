@@ -13,19 +13,32 @@
 #include <ESP8266mDNS.h>
 #include "declaration_fun.h"
 
+// 设定数据存储位置
 #define EEPROM_INITADDR 0
 #define EEPROM_SETUPNUMADDR 1
 #define EEPROM_WIFIADDR 2
 
+// 初始化oled图形库（u8g2） ps:感觉这个库有点臃肿，后期有精力会更换
 U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, 12, 14);
+
 int onboardledPin = 2;
 int enterVal, backVal, rightVal, leftVal;
+uint8_t enterKey = 5;
+uint8_t backKey = 4;
+uint8_t rightKey = 13;
+uint8_t leftKey = 0;
+
+// ntp时间相关
 int timezone = 8;
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", timezone * 3600, 60000);
+
+// 自建web服务
 ESP8266WebServer mcuserver(80);
 char const *mDNSname = "setting";
 bool serverflg = 0;
+
+// 为多级菜单构建的结构体
 struct Menu
 {
   int index;
@@ -35,18 +48,22 @@ struct Menu
   int back;
   void (*callback)();
 };
-uint8_t enterKey = 5;
-uint8_t backKey = 4;
-uint8_t rightKey = 13;
-uint8_t leftKey = 0;
+
+// mqtt 远程服务器连接
 char const *mqtt_server = "175.24.88.178"; //"192.168.31.127";
 char const *itopic = "cube/dashboard";
-uint8_t intervalmessagetime = 5;
-int timenowEpoch = 0;
-int recmessagetime = 0;
-uint8_t nomessagesflag = 1;
 WiFiClient espClient;
 PubSubClient client(espClient);
+
+// mqtt消息解释为未响应的超时时间（4s）[timenowEpoch-recmessagetime]
+uint8_t intervalmessagetime = 4;
+// 当前时间戳
+int timenowEpoch = 0;
+// mqtt消息接收时的时间戳
+int recmessagetime = 0;
+uint8_t nomessagesflag = 1;
+
+// 树莓派传来的消息结构体
 struct DashboardData
 {
   int up_time;
@@ -71,6 +88,7 @@ struct DashboardData
   int alert;
 };
 DashboardData currentData;
+
 struct EepromData
 {
   String init;
@@ -79,9 +97,14 @@ struct EepromData
   String wifi_password;
 };
 EepromData memoryData;
+
+// 创建定时器（设备开启超过3s，不再计入短时间重启次数）
 Ticker restclock;
+
+// 额。。。。忘了干啥的了，想起来再补上
 bool wifisetupflg = 1;
 
+// 启动智能配网
 void ICACHE_FLASH_ATTR wifi_smartConfig()
 {
   int wificonnum = 0;
@@ -122,6 +145,7 @@ void ICACHE_FLASH_ATTR wifi_smartConfig()
   wifisetupflg = 0;
 }
 
+// 获取配网中得到的wifi信息
 String ICACHE_FLASH_ATTR wifi_smartConfigGetStr()
 {
   String wificonfig = "";
@@ -135,6 +159,7 @@ String ICACHE_FLASH_ATTR wifi_smartConfigGetStr()
   return wificonfig;
 }
 
+// 从存储中读取wifi信息
 void ICACHE_FLASH_ATTR wifi_eepromGetStr(int addr)
 {
   String dataread;
@@ -171,6 +196,7 @@ void ICACHE_FLASH_ATTR wifi_eepromGetStr(int addr)
   }
 }
 
+// 将wifi信息写入存储中固化
 void ICACHE_FLASH_ATTR wifi_eepromPutStr(int addr, String datawritten)
 {
   EEPROM.write(addr, datawritten.length());
@@ -181,6 +207,7 @@ void ICACHE_FLASH_ATTR wifi_eepromPutStr(int addr, String datawritten)
   EEPROM.commit();
 }
 
+// 设备全新时的初始化
 void ICACHE_FLASH_ATTR initdev()
 {
   wifi_smartConfig();
@@ -190,12 +217,14 @@ void ICACHE_FLASH_ATTR initdev()
   EEPROM.commit();
 }
 
+// 定时器回调
 void ICACHE_FLASH_ATTR clockCallback()
 {
   EEPROM.write(EEPROM_SETUPNUMADDR, 0);
   EEPROM.commit();
 }
 
+// 连续（间隔不超过3s）开关电源，恢复设备初始化
 void ICACHE_FLASH_ATTR restWifiConfig()
 {
   EEPROM.write(EEPROM_SETUPNUMADDR, EEPROM.read(EEPROM_SETUPNUMADDR) + 1);
@@ -235,6 +264,7 @@ void ICACHE_FLASH_ATTR initCurrentData()
   currentData.alert = 0;
 };
 
+// wifi连接
 void ICACHE_FLASH_ATTR wifi_setup()
 {
   int wificonnum = 0;
@@ -303,6 +333,7 @@ void ICACHE_FLASH_ATTR mqttCallback(char *topic, byte *payload, unsigned int len
   }
 }
 
+// mqtt远程服务器注册（可用作掉网重连mqtt）
 void ICACHE_FLASH_ATTR mqtt_reconnect()
 {
   while (!client.connected())
@@ -788,6 +819,7 @@ void ICACHE_FLASH_ATTR serverPage()
   u8g2.sendBuffer();
 }
 
+// 日历页面（正在施工中。。。。）
 void ICACHE_FLASH_ATTR datePage()
 {
   // uint8_t netx = 2;
@@ -808,6 +840,7 @@ void ICACHE_FLASH_ATTR datePage()
   u8g2.sendBuffer();
 }
 
+// 提醒页面(正在施工中。。。。)
 void ICACHE_FLASH_ATTR notePage()
 {
   // uint8_t netx = 2;
@@ -828,6 +861,7 @@ void ICACHE_FLASH_ATTR notePage()
   u8g2.sendBuffer();
 }
 
+// 生命剩余时间(正在施工中。。。。)
 void ICACHE_FLASH_ATTR lifePage()
 {
   // uint8_t netx = 2;
@@ -848,6 +882,7 @@ void ICACHE_FLASH_ATTR lifePage()
   u8g2.sendBuffer();
 }
 
+// 倒计时页面（正在施工中。。。。）
 void ICACHE_FLASH_ATTR countDownPage()
 {
   // uint8_t netx = 2;
@@ -868,6 +903,7 @@ void ICACHE_FLASH_ATTR countDownPage()
   u8g2.sendBuffer();
 }
 
+// 对树莓派进行简单的操作，无论树莓派什么反应，都会重启本设备（逻辑有点问题，有待优化）
 void ICACHE_FLASH_ATTR controlPage()
 {
   uint8_t netx = 2;
@@ -892,6 +928,7 @@ void ICACHE_FLASH_ATTR controlPage()
   u8g2.sendBuffer();
 }
 
+// 树莓派音量调节(正在施工中。。。。)
 void ICACHE_FLASH_ATTR volumePage()
 {
   u8g2.clearBuffer();
@@ -926,11 +963,13 @@ void ICACHE_FLASH_ATTR settingPage()
   }
 }
 
+// web服务相关
 void ICACHE_FLASH_ATTR serverHomePage()
 {
   mcuserver.send(200, "text/plain", "test homepage !");
 }
 
+// 启动web服务，进行网页端的设置（正在施工中。。。。）
 void ICACHE_FLASH_ATTR doSettingPage()
 {
   uint8_t netx = 2;
@@ -961,6 +1000,7 @@ void ICACHE_FLASH_ATTR doSettingPage()
   }
 }
 
+// 省电模式初探
 // void ICACHE_FLASH_ATTR light_sleep()
 // {
 //   wifi_station_disconnect();
@@ -972,6 +1012,7 @@ void ICACHE_FLASH_ATTR doSettingPage()
 //   u8g2.setPowerSave(1);
 // }
 
+// 多级菜单的结构层次，跳转逻辑（有待优化）
 Menu menu[21] = {
     //---------time-----------
     {0, 18, 4, 1, 0, timePage},
@@ -1006,8 +1047,10 @@ void (*operation_index)();
 int func_index = 0;
 // int stack_func_index = 0;
 
+// 入口程序，arduino对 main() 进行了封装，只执行一次
 void setup()
 {
+  // 打开串口输出（没怎么用，有待详细化）
   Serial.begin(115200);
   pinMode(onboardledPin, OUTPUT);
   digitalWrite(onboardledPin, LOW);
@@ -1046,6 +1089,7 @@ void setup()
   u8g2.drawStr(0, 0, "wifi");
   u8g2.sendBuffer();
 
+  // 忘了为什么这么写了（想起来了补上）
   if (wifisetupflg)
   {
     wifi_setup(); //
@@ -1093,18 +1137,21 @@ void setup()
 
   u8g2.drawRBox(30, 54, 68, 6, 2);
   u8g2.sendBuffer();
+
   recmessagetime = timeClient.getEpochTime();
   u8g2.setFontDirection(0);
 }
 
 void loop()
 {
+  // wifi连接异常处理
   while (WiFi.status() != WL_CONNECTED)
   {
     wifiErrPage();
     delay(500);
   }
 
+  // mqtt远程服务器异常处理
   if (!client.connected())
   {
     noMessagesPage();
@@ -1112,6 +1159,7 @@ void loop()
   }
   client.loop();
 
+  // web服务相关
   if (serverflg)
   {
     mcuserver.handleClient();
@@ -1122,6 +1170,7 @@ void loop()
   leftVal = digitalRead(leftKey);
   rightVal = digitalRead(rightKey);
 
+  // 长时间未收到消息，视为mqtt消息异常
   nomessagesflag = 0;
   timenowEpoch = timeClient.getEpochTime();
   if (timenowEpoch - recmessagetime > intervalmessagetime)
