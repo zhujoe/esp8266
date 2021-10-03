@@ -1,8 +1,9 @@
 # "Chocolate"
 
-[![repo_size](https://img.shields.io/github/repo-size/tensorflow/tensorflow.svg)](repo_size)
-[![last_commit](https://img.shields.io/github/last-commit/tensorflow/tensorflow.svg)](last_commit)
-[![license](https://img.shields.io/github/license/tensorflow/tensorflow.svg)](LICENSE)
+[![start](https://img.shields.io/github/stars/zhujoe/esp8266.svg)](start)
+[![repo_size](https://img.shields.io/github/repo-size/zhujoe/esp8266.svg)](repo_size)
+[![last_commit](https://img.shields.io/github/last-commit/zhujoe/esp8266.svg)](last_commit)
+[![license](https://img.shields.io/github/license/zhujoe/esp8266.svg)](LICENSE)
 
 这是一个基于 esp8266（_Nodemcu_）开发板的玩具工程。
 由模块堆积成的一块板子，神似巧克力（_抽象_）所以起名为 “__巧克力__”
