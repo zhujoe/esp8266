@@ -55,8 +55,8 @@ char const *itopic = "cube/dashboard";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-// mqtt消息解释为未响应的超时时间（4s）[timenowEpoch-recmessagetime]
-uint8_t intervalmessagetime = 4;
+// mqtt消息解释为未响应的超时时间（3s）[timenowEpoch-recmessagetime]
+uint8_t intervalmessagetime = 3;
 // 当前时间戳
 int timenowEpoch = 0;
 // mqtt消息接收时的时间戳
@@ -1138,7 +1138,8 @@ void setup()
   u8g2.drawRBox(30, 54, 68, 6, 2);
   u8g2.sendBuffer();
 
-  recmessagetime = timeClient.getEpochTime();
+  // recmessagetime = timeClient.getEpochTime();
+  // recmessagetime = 0;
   u8g2.setFontDirection(0);
 }
 
