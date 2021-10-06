@@ -1056,6 +1056,7 @@ void setup()
   digitalWrite(onboardledPin, LOW);
 
   EEPROM.begin(1024);
+  u8g2.setBusClock(1000000);
   u8g2.begin();
 
   Serial.println(EEPROM.read(EEPROM_INITADDR));
