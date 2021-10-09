@@ -1,6 +1,7 @@
 #ifndef DECLARATION_FUN_H
 #define DECLARATION_FUN_H
 
+void zeroScreenBuf(uint8_t *);
 /*-------------------------------------------------------
     jingwei_wificfg
   -------------------------------------------------------*/
@@ -30,27 +31,27 @@ void mqtt_reconnect();
     jingwei_menu.c
   -------------------------------------------------------*/
 
-void timePage();
-void totalityPage();
-void uptimePage();
-void cpuPage();
-void diskPage();
-void memoryPage();
-void networkPage();
-void noMessagesPage();
-void rebootPage();
-void doreboot();
-void shutdownPage();
-void doshutdown();
-void serverPage();
-void datePage();
-void notePage();
-void lifePage();
-void countDownPage();
-void controlPage();
-void volumePage();
-void settingPage();
-void dosettingPage();
+uint8_t *timePage();
+uint8_t *totalityPage();
+uint8_t *uptimePage();
+uint8_t *cpuPage();
+uint8_t *diskPage();
+uint8_t *memoryPage();
+uint8_t *networkPage();
+// uint8_t* noMessagesPage();
+uint8_t *rebootPage();
+uint8_t *doreboot();
+uint8_t *shutdownPage();
+uint8_t *doshutdown();
+uint8_t *serverPage();
+uint8_t *datePage();
+uint8_t *notePage();
+uint8_t *lifePage();
+uint8_t *countDownPage();
+uint8_t *controlPage();
+uint8_t *volumePage();
+uint8_t *settingPage();
+uint8_t *dosettingPage();
 
 void initdev();
 void clockCallback();
