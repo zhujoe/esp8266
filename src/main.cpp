@@ -711,8 +711,8 @@ uint8_t *ICACHE_FLASH_ATTR doreboot()
   u8g2.drawGlyph(95, 62, 120);
   // u8g2.sendBuffer();
 
-  delay(2000);
-  ESP.restart();
+  // delay(2000);
+  // ESP.restart();
   return u8g2.getBufferPtr();
 }
 
@@ -752,8 +752,8 @@ uint8_t *ICACHE_FLASH_ATTR doshutdown()
   u8g2.drawGlyph(95, 62, 120);
   // u8g2.sendBuffer();
 
-  delay(2000);
-  ESP.restart();
+  // delay(2000);
+  // ESP.restart();
   return u8g2.getBufferPtr();
 }
 
@@ -1219,9 +1219,9 @@ Menu menu[21] = {
     //-------server_control-------
     {11, 10, 5, 12, 4, controlPage},
     {12, 16, 14, 13, 11, rebootPage},
-    {13, 13, 13, 13, 13, doreboot},
+    {13, 13, 13, 13, 12, doreboot},
     {14, 12, 16, 15, 11, shutdownPage},
-    {15, 15, 15, 15, 15, doshutdown},
+    {15, 15, 15, 15, 14, doshutdown},
     {16, 14, 12, 16, 11, volumePage},
     //---------note----------
     {17, 4, 18, 17, 17, notePage},
