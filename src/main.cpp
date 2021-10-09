@@ -1245,7 +1245,7 @@ void setup()
   pinMode(onboardledPin, OUTPUT);
   digitalWrite(onboardledPin, LOW);
 
-  ESP.wdtEnable(WDTO_4S);
+  ESP.wdtEnable(WDTO_2S);
   EEPROM.begin(1024);
   u8g2.setBusClock(1000000);
   u8g2.begin();
