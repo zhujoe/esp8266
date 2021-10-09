@@ -18,8 +18,8 @@
 #define EEPROM_SETUPNUMADDR 1
 #define EEPROM_WIFIADDR 2
 
-// 初始化oled图形库（u8g2） ps:感觉这个库有点臃肿，后期有精力会更换
-U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, 12, 14);
+// U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, 12, 14);
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE, /* clock=*/12, /* data=*/14);
 
 int onboardledPin = 2;
 int enterVal, backVal, rightVal, leftVal;
@@ -46,7 +46,7 @@ struct Menu
   int right;
   int enter;
   int back;
-  void (*callback)();
+  uint8_t *(*callback)();
 };
 
 // mqtt 远程服务器连接
@@ -103,6 +103,9 @@ Ticker restclock;
 
 // 额。。。。忘了干啥的了，想起来再补上
 bool wifisetupflg = 1;
+
+// 界面缓存
+uint8_t *buf_arry;
 
 // 启动智能配网
 void ICACHE_FLASH_ATTR wifi_smartConfig()
@@ -348,7 +351,7 @@ void ICACHE_FLASH_ATTR mqtt_reconnect()
     }
     else
     {
-      u8g2.sendBuffer();
+      // u8g2.sendBuffer();
       delay(3000);
     }
   }
@@ -395,24 +398,26 @@ void ICACHE_FLASH_ATTR headPage()
   u8g2.drawHLine(0, 9, 128);
 }
 
-void ICACHE_FLASH_ATTR timePage()
+uint8_t *ICACHE_FLASH_ATTR timePage()
 {
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   u8g2.setFont(u8g2_font_timB24_tn);
-  u8g2.setCursor(0, 50);
+  u8g2.setCursor(0, 55);
   u8g2.print(timeClient.getFormattedTime());
 
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
-void ICACHE_FLASH_ATTR totalityPage()
+uint8_t *ICACHE_FLASH_ATTR totalityPage()
 {
   uint8_t netx = 2;
   uint8_t nety = 18;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   u8g2.setFont(u8g2_font_5x8_tr);
@@ -456,10 +461,12 @@ void ICACHE_FLASH_ATTR totalityPage()
   // u8g2.setCursor(netx, nety);
   // u8g2.print("time_stamp  ");
   // u8g2.print(currentData.tm_stamp_cst);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
-void ICACHE_FLASH_ATTR uptimePage()
+uint8 *ICACHE_FLASH_ATTR uptimePage()
 {
   int second = 0;
   int minute = 0;
@@ -470,7 +477,7 @@ void ICACHE_FLASH_ATTR uptimePage()
   second = currentData.up_time % 60;
   minute = currentData.up_time / 60 % 60;
   hour = currentData.up_time / 3600;
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   u8g2.setFont(u8g2_font_6x10_tf);
@@ -488,15 +495,17 @@ void ICACHE_FLASH_ATTR uptimePage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 123);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
-void ICACHE_FLASH_ATTR cpuPage()
+uint8_t *ICACHE_FLASH_ATTR cpuPage()
 {
   uint8_t netx = 2;
   uint8_t nety = 18;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   u8g2.setFont(u8g2_font_6x10_tf);
@@ -523,15 +532,17 @@ void ICACHE_FLASH_ATTR cpuPage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 177);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
-void ICACHE_FLASH_ATTR diskPage()
+uint8_t *ICACHE_FLASH_ATTR diskPage()
 {
   uint8_t netx = 2;
   uint8_t nety = 18;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   u8g2.setFont(u8g2_font_6x10_tf);
@@ -553,15 +564,17 @@ void ICACHE_FLASH_ATTR diskPage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 171);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
-void ICACHE_FLASH_ATTR memoryPage()
+uint8_t *ICACHE_FLASH_ATTR memoryPage()
 {
   uint8_t netx = 2;
   uint8_t nety = 18;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   u8g2.setFont(u8g2_font_6x10_tf);
@@ -594,15 +607,17 @@ void ICACHE_FLASH_ATTR memoryPage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 139);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
-void ICACHE_FLASH_ATTR networkPage()
+uint8_t *ICACHE_FLASH_ATTR networkPage()
 {
   uint8_t netx = 2;
   uint8_t nety = 18;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   u8g2.setFont(u8g2_font_6x10_tf);
@@ -633,7 +648,9 @@ void ICACHE_FLASH_ATTR networkPage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 194);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
 void ICACHE_FLASH_ATTR noMessagesPage()
@@ -658,9 +675,9 @@ void ICACHE_FLASH_ATTR noMessagesPage()
   u8g2.sendBuffer();
 }
 
-void ICACHE_FLASH_ATTR rebootPage()
+uint8_t *ICACHE_FLASH_ATTR rebootPage()
 {
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   u8g2.setFont(u8g2_font_8x13_tf);
@@ -669,16 +686,18 @@ void ICACHE_FLASH_ATTR rebootPage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 243);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
-void ICACHE_FLASH_ATTR doreboot()
+uint8_t *ICACHE_FLASH_ATTR doreboot()
 {
   uint8_t netx = 2;
   uint8_t nety = 18;
 
   client.publish(itopic, "reboot", 0);
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
   u8g2.setFont(u8g2_font_6x10_tf);
   u8g2.setCursor(netx, nety);
@@ -690,14 +709,16 @@ void ICACHE_FLASH_ATTR doreboot()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 120);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
   delay(2000);
   ESP.restart();
+  return u8g2.getBufferPtr();
 }
 
-void ICACHE_FLASH_ATTR shutdownPage()
+uint8_t *ICACHE_FLASH_ATTR shutdownPage()
 {
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   u8g2.setFont(u8g2_font_8x13_tf);
@@ -706,16 +727,18 @@ void ICACHE_FLASH_ATTR shutdownPage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 235);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
-void ICACHE_FLASH_ATTR doshutdown()
+uint8_t *ICACHE_FLASH_ATTR doshutdown()
 {
   uint8_t netx = 2;
   uint8_t nety = 18;
 
   client.publish(itopic, "shutdown", 0);
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
   u8g2.setFont(u8g2_font_6x10_tf);
   u8g2.setCursor(netx, nety);
@@ -727,9 +750,11 @@ void ICACHE_FLASH_ATTR doshutdown()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 120);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
   delay(2000);
   ESP.restart();
+  return u8g2.getBufferPtr();
 }
 
 void ICACHE_FLASH_ATTR smartcfgPage_off()
@@ -795,12 +820,12 @@ void ICACHE_FLASH_ATTR wifiErrPage()
   u8g2.sendBuffer();
 }
 
-void ICACHE_FLASH_ATTR serverPage()
+uint8_t *ICACHE_FLASH_ATTR serverPage()
 {
   uint8_t netx = 2;
   uint8_t nety = 18;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   if (nomessagesflag == 1)
@@ -816,16 +841,18 @@ void ICACHE_FLASH_ATTR serverPage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 222);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
 // 日历页面（正在施工中。。。。）
-void ICACHE_FLASH_ATTR datePage()
+uint8_t *ICACHE_FLASH_ATTR datePage()
 {
   // uint8_t netx = 2;
   // uint8_t nety = 17;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
   // u8g2.setFont(u8g2_font_6x10_tf);
   // u8g2.setCursor(netx, nety);
@@ -837,16 +864,18 @@ void ICACHE_FLASH_ATTR datePage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 249);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
 // 提醒页面(正在施工中。。。。)
-void ICACHE_FLASH_ATTR notePage()
+uint8_t *ICACHE_FLASH_ATTR notePage()
 {
   // uint8_t netx = 2;
   // uint8_t nety = 17;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
   // u8g2.setFont(u8g2_font_6x10_tf);
   // u8g2.setCursor(netx, nety);
@@ -858,16 +887,18 @@ void ICACHE_FLASH_ATTR notePage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 257);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
 // 生命剩余时间(正在施工中。。。。)
-void ICACHE_FLASH_ATTR lifePage()
+uint8_t *ICACHE_FLASH_ATTR lifePage()
 {
   // uint8_t netx = 2;
   // uint8_t nety = 17;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
   // u8g2.setFont(u8g2_font_6x10_tf);
   // u8g2.setCursor(netx, nety);
@@ -879,16 +910,18 @@ void ICACHE_FLASH_ATTR lifePage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 98);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
 // 倒计时页面（正在施工中。。。。）
-void ICACHE_FLASH_ATTR countDownPage()
+uint8_t *ICACHE_FLASH_ATTR countDownPage()
 {
   // uint8_t netx = 2;
   // uint8_t nety = 17;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
   // u8g2.setFont(u8g2_font_6x10_tf);
   // u8g2.setCursor(netx, nety);
@@ -900,16 +933,18 @@ void ICACHE_FLASH_ATTR countDownPage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 269);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
 // 对树莓派进行简单的操作，无论树莓派什么反应，都会重启本设备（逻辑有点问题，有待优化）
-void ICACHE_FLASH_ATTR controlPage()
+uint8_t *ICACHE_FLASH_ATTR controlPage()
 {
   uint8_t netx = 2;
   uint8_t nety = 18;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   if (nomessagesflag == 1)
@@ -925,13 +960,15 @@ void ICACHE_FLASH_ATTR controlPage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 265);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
 // 树莓派音量调节(正在施工中。。。。)
-void ICACHE_FLASH_ATTR volumePage()
+uint8_t *ICACHE_FLASH_ATTR volumePage()
 {
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
   u8g2.setFont(u8g2_font_8x13_tf);
   u8g2.setCursor(2, 60);
@@ -939,12 +976,14 @@ void ICACHE_FLASH_ATTR volumePage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 105);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
+
+  return u8g2.getBufferPtr();
 }
 
-void ICACHE_FLASH_ATTR settingPage()
+uint8_t *ICACHE_FLASH_ATTR settingPage()
 {
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
 
   u8g2.setFont(u8g2_font_8x13_tf);
@@ -953,14 +992,15 @@ void ICACHE_FLASH_ATTR settingPage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 129);
-  u8g2.sendBuffer();
-
+  // u8g2.sendBuffer();
   if (serverflg)
   {
     serverflg = 0;
     mcuserver.stop();
     // MDNS.close();
   }
+
+  return u8g2.getBufferPtr();
 }
 
 // web服务相关
@@ -970,12 +1010,12 @@ void ICACHE_FLASH_ATTR serverHomePage()
 }
 
 // 启动web服务，进行网页端的设置（正在施工中。。。。）
-void ICACHE_FLASH_ATTR doSettingPage()
+uint8_t *ICACHE_FLASH_ATTR doSettingPage()
 {
   uint8_t netx = 2;
   uint8_t nety = 18;
 
-  u8g2.clearBuffer();
+  // u8g2.clearBuffer();
   headPage();
   u8g2.setFont(u8g2_font_6x10_tf);
   u8g2.setCursor(netx, nety);
@@ -989,7 +1029,7 @@ void ICACHE_FLASH_ATTR doSettingPage()
 
   u8g2.setFont(u8g2_font_open_iconic_all_4x_t);
   u8g2.drawGlyph(95, 62, 120);
-  u8g2.sendBuffer();
+  // u8g2.sendBuffer();
 
   if (serverflg == 0)
   {
@@ -998,6 +1038,8 @@ void ICACHE_FLASH_ATTR doSettingPage()
     mcuserver.begin();
     serverflg = 1;
   }
+
+  return u8g2.getBufferPtr();
 }
 
 // 省电模式初探
@@ -1011,6 +1053,153 @@ void ICACHE_FLASH_ATTR doSettingPage()
 //   wifi_fpm_do_sleep(0xFFFFFFF);
 //   u8g2.setPowerSave(1);
 // }
+
+// 手动归零显示缓冲区
+void ICACHE_FLASH_ATTR zeroScreenBuf(uint8_t *page)
+{
+  uint8_t i, n;
+  for (i = 1; i < 8; i++)
+  {
+    for (n = 0; n < 128; n++)
+    {
+      page[n + i * 128] = 0x00;
+    }
+  }
+}
+
+//页面横向下->返回动画
+void ICACHE_FLASH_ATTR switchPagesDown(uint8_t page1[1024], uint8_t page2[1024])
+{
+  uint8_t *screenbuf;
+
+  u8g2.clearBuffer();
+  headPage();
+  screenbuf = u8g2.getBufferPtr();
+
+  zeroScreenBuf(screenbuf);
+
+  // 7/1=7 动画完成需要移动7次（可调节）
+
+  // 列控制
+  for (int i = 1; i < 8; i++)
+  {
+    // 行控制
+    for (int k = 0; k < 128; k++)
+    {
+      for (int first = i + 1; first < 8; first++)
+      {
+        screenbuf[first * 128 + k] = page1[(first - i) * 128 + k];
+      }
+      for (int second = 1; second <= i; second++)
+      {
+        screenbuf[second * 128 + k] = page2[(second + 7 - i) * 128 + k];
+      }
+    }
+    u8g2.sendBuffer();
+    ESP.wdtFeed();
+    delay(15);
+  }
+}
+
+//页面横向上->确认动画
+void ICACHE_FLASH_ATTR switchPagesUp(uint8_t page1[1024], uint8_t page2[1024])
+{
+  uint8_t *screenbuf;
+
+  u8g2.clearBuffer();
+  headPage();
+  screenbuf = u8g2.getBufferPtr();
+
+  zeroScreenBuf(screenbuf);
+
+  // 7/1=7 动画完成需要移动7次（可调节）
+
+  // 列控制
+  for (int i = 1; i < 8; i++)
+  {
+    // 行控制
+    for (int k = 0; k < 128; k++)
+    {
+      for (int first = i + 1; first < 8; first++)
+      {
+        screenbuf[(first - i) * 128 + k] = page1[first * 128 + k];
+      }
+      for (int second = 1; second <= i; second++)
+      {
+        screenbuf[(second + 7 - i) * 128 + k] = page2[second * 128 + k];
+      }
+    }
+    u8g2.sendBuffer();
+    ESP.wdtFeed();
+    delay(15);
+  }
+}
+
+//页面横向左->切换动画
+void ICACHE_FLASH_ATTR switchPagesL(uint8_t page1[1024], uint8_t page2[1024])
+{
+  uint8_t *screenbuf;
+
+  u8g2.clearBuffer();
+  headPage();
+  screenbuf = u8g2.getBufferPtr();
+
+  zeroScreenBuf(screenbuf);
+
+  // 128/8=16 动画完成需要移动16次（可调节）
+  // 行控制
+  for (int k = 0; k < 128; k += 8)
+  {
+    // 列控制
+    for (int i = 1; i < 8; i++)
+    {
+      for (int first = 0; first < 128 - k; first++)
+      {
+        screenbuf[i * 128 + first + k] = page1[i * 128 + first];
+      }
+      for (int second = 128 - k; second < 128; second++)
+      {
+        screenbuf[i * 128 + second - 127 + k] = page2[i * 128 + second];
+      }
+    }
+    u8g2.sendBuffer();
+    ESP.wdtFeed();
+    delay(7);
+  }
+}
+
+// 页面横向右->切换动画
+void ICACHE_FLASH_ATTR switchPagesR(uint8_t page1[1024], uint8_t page2[1024])
+{
+  uint8_t *screenbuf;
+
+  u8g2.clearBuffer();
+  headPage();
+  screenbuf = u8g2.getBufferPtr();
+
+  zeroScreenBuf(screenbuf);
+
+  // 128/8=16 动画完成需要移动16次（可调节）
+  // 行控制
+  for (int k = 0; k < 128; k += 8)
+  {
+    // 列控制
+    for (int i = 1; i < 8; i++)
+    {
+      for (int first = k; first < 128; first++)
+      {
+        screenbuf[i * 128 + first - k] = page1[i * 128 + first];
+      }
+      for (int second = 0; second < k; second++)
+      {
+        screenbuf[i * 128 + 127 - k + second] = page2[i * 128 + second];
+      }
+    }
+    u8g2.sendBuffer();
+    ESP.wdtFeed();
+    delay(7);
+  }
+}
 
 // 多级菜单的结构层次，跳转逻辑（有待优化）
 Menu menu[21] = {
@@ -1040,12 +1229,13 @@ Menu menu[21] = {
     {18, 17, 0, 19, 18, settingPage},
     {19, 19, 19, 19, 18, doSettingPage},
     //--------other status-----
-    {20, 20, 20, 20, 20, noMessagesPage},
+    // {20, 20, 20, 20, 20, noMessagesPage},
 
 };
-void (*operation_index)();
+uint8_t *(*operation_index)();
 int func_index = 0;
-// int stack_func_index = 0;
+uint8_t first_screen[1024];
+uint8_t second_screen[1024];
 
 // 入口程序，arduino对 main() 进行了封装，只执行一次
 void setup()
@@ -1055,6 +1245,7 @@ void setup()
   pinMode(onboardledPin, OUTPUT);
   digitalWrite(onboardledPin, LOW);
 
+  ESP.wdtEnable(WDTO_4S);
   EEPROM.begin(1024);
   u8g2.setBusClock(1000000);
   u8g2.begin();
@@ -1086,6 +1277,7 @@ void setup()
   u8g2.setFontDirection(1);
 
   randomSeed(micros()); //
+  Serial.println("I'm here!!!");
   u8g2.drawRBox(30, 54, 10, 6, 2);
   u8g2.drawStr(0, 0, "wifi");
   u8g2.sendBuffer();
@@ -1187,44 +1379,130 @@ void loop()
     {
       while (!enterVal)
       {
+        ESP.wdtFeed();
         enterVal = digitalRead(enterKey);
         operation_index = menu[func_index].callback;
-        (*operation_index)();
+        u8g2.clearBuffer();
+        buf_arry = (*operation_index)();
+        u8g2.sendBuffer();
       }
-      func_index = menu[func_index].enter;
+      if (func_index != menu[func_index].enter)
+      {
+        zeroScreenBuf(first_screen);
+        for (int a = 0; a < 1024; a++)
+        {
+          first_screen[a] = buf_arry[a];
+        }
+        u8g2.clearBuffer();
+
+        func_index = menu[func_index].enter;
+        operation_index = menu[func_index].callback;
+        buf_arry = (*operation_index)();
+        zeroScreenBuf(second_screen);
+        for (int a = 0; a < 1024; a++)
+        {
+          second_screen[a] = buf_arry[a];
+        }
+        switchPagesUp(first_screen, second_screen);
+      }
     }
+
     if (backVal == LOW)
     {
       while (!backVal)
       {
+        ESP.wdtFeed();
         backVal = digitalRead(backKey);
         operation_index = menu[func_index].callback;
-        (*operation_index)();
+        u8g2.clearBuffer();
+        buf_arry = (*operation_index)();
+        u8g2.sendBuffer();
       }
-      func_index = menu[func_index].back;
+      if (func_index != menu[func_index].back)
+      {
+        zeroScreenBuf(first_screen);
+        for (int a = 0; a < 1024; a++)
+        {
+          first_screen[a] = buf_arry[a];
+        }
+        u8g2.clearBuffer();
+
+        func_index = menu[func_index].back;
+        operation_index = menu[func_index].callback;
+        buf_arry = (*operation_index)();
+        zeroScreenBuf(second_screen);
+        for (int a = 0; a < 1024; a++)
+        {
+          second_screen[a] = buf_arry[a];
+        }
+        switchPagesDown(first_screen, second_screen);
+      }
     }
     if (leftVal == LOW)
     {
       while (!leftVal)
       {
+        ESP.wdtFeed();
         leftVal = digitalRead(leftKey);
         operation_index = menu[func_index].callback;
-        (*operation_index)();
+        u8g2.clearBuffer();
+        buf_arry = (*operation_index)();
+        u8g2.sendBuffer();
       }
-      func_index = menu[func_index].left;
+      if (func_index != menu[func_index].left)
+      {
+        zeroScreenBuf(first_screen);
+        for (int a = 0; a < 1024; a++)
+        {
+          first_screen[a] = buf_arry[a];
+        }
+        u8g2.clearBuffer();
+        func_index = menu[func_index].left;
+        operation_index = menu[func_index].callback;
+        buf_arry = (*operation_index)();
+        zeroScreenBuf(second_screen);
+        for (int a = 0; a < 1024; a++)
+        {
+          second_screen[a] = buf_arry[a];
+        }
+        switchPagesL(first_screen, second_screen);
+      }
     }
     if (rightVal == LOW)
     {
       while (!rightVal)
       {
+        ESP.wdtFeed();
         rightVal = digitalRead(rightKey);
         operation_index = menu[func_index].callback;
-        (*operation_index)();
+        u8g2.clearBuffer();
+        buf_arry = (*operation_index)();
+        u8g2.sendBuffer();
       }
-      func_index = menu[func_index].right;
+      if (func_index != menu[func_index].right)
+      {
+        zeroScreenBuf(first_screen);
+        for (int a = 0; a < 1024; a++)
+        {
+          first_screen[a] = buf_arry[a];
+        }
+        u8g2.clearBuffer();
+        func_index = menu[func_index].right;
+        operation_index = menu[func_index].callback;
+        buf_arry = (*operation_index)();
+        zeroScreenBuf(second_screen);
+        for (int a = 0; a < 1024; a++)
+        {
+          second_screen[a] = buf_arry[a];
+        }
+        switchPagesR(first_screen, second_screen);
+      }
     }
   }
 
+  ESP.wdtFeed();
   operation_index = menu[func_index].callback;
+  u8g2.clearBuffer();
   (*operation_index)();
+  u8g2.sendBuffer();
 }
